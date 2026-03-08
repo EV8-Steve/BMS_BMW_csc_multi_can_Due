@@ -8,7 +8,7 @@
 extern BMSModuleManager bms;
 extern SOCManager soc;
 extern CSCAddressManager csc;
-extern SettingsManager settings;
+extern SettingsManager settingsManager;
 
 extern float currentact;
 
@@ -27,7 +27,12 @@ void SerialConsoleManager::init()
     mode = MODE_MAIN;
 }
 
-
+void SerialConsoleManager::printPackSummary() {}
+void SerialConsoleManager::printCellTable() {}
+void SerialConsoleManager::printTemperatureTable() {}
+void SerialConsoleManager::printCSVHeader() {}
+void SerialConsoleManager::printModuleMap() {}
+void SerialConsoleManager::printCSVTelemetry() {}
 
 /*
 ================================================
@@ -137,6 +142,21 @@ void SerialConsoleManager::update()
 
 }
 
+/*
+================================================
+Main Menu
+================================================
+*/
+
+
+void SerialConsoleManager::printMainMenu()
+{
+    Serial.println();
+    Serial.println("=== SimpBMS Menu ===");
+    Serial.println("1 - Battery settings");
+    Serial.println("2 - Charger settings");
+    Serial.println("3 - Current sensor settings");
+}
 
 
 /*
@@ -148,7 +168,7 @@ Battery Menu
 void SerialConsoleManager::printBatteryMenu()
 {
 
-    auto &s = settings.get();
+    auto &s = settingsManager.get();
 
     Serial.println();
     Serial.println("===== Battery Settings =====");
@@ -229,7 +249,7 @@ Battery Menu Handler
 void SerialConsoleManager::handleBatteryMenu(char cmd)
 {
 
-    auto &s = settings.get();
+    auto &s = settingsManager.get();
 
     switch(cmd)
     {
@@ -323,7 +343,7 @@ void SerialConsoleManager::handleBatteryMenu(char cmd)
 
     }
 
-    settings.save();
+    settingsManager.save();
     printBatteryMenu();
 
 }
@@ -339,7 +359,7 @@ Charger Menu
 void SerialConsoleManager::printChargerMenu()
 {
 
-    auto &s = settings.get();
+    auto &s = settingsManager.get();
 
     Serial.println();
     Serial.println("===== Charger Settings =====");
@@ -374,7 +394,7 @@ Charger Menu Handler
 void SerialConsoleManager::handleChargerMenu(char cmd)
 {
 
-    auto &s = settings.get();
+    auto &s = settingsManager.get();
 
     switch(cmd)
     {
@@ -414,8 +434,7 @@ void SerialConsoleManager::handleChargerMenu(char cmd)
 
     }
 
-    settings.save();
-    printChargerMenu();
+
 
 }
 
@@ -430,7 +449,7 @@ Current Sensor Menu
 void SerialConsoleManager::printCurrentSensorMenu()
 {
 
-    auto &s = settings.get();
+    auto &s = settingsManager.get();
 
     Serial.println();
     Serial.println("===== Current Sensor Settings =====");
@@ -452,6 +471,10 @@ void SerialConsoleManager::printCurrentSensorMenu()
 
     Serial.println("q Return");
 
+
+
+
+
 }
 
 
@@ -465,7 +488,7 @@ Current Sensor Menu Handler
 void SerialConsoleManager::handleCurrentSensorMenu(char cmd)
 {
 
-    auto &s = settings.get();
+    auto &s = settingsManager.get();
 
     switch(cmd)
     {
@@ -505,7 +528,7 @@ void SerialConsoleManager::handleCurrentSensorMenu(char cmd)
 
     }
 
-    settings.save();
+    settingsManager.save();
     printCurrentSensorMenu();
 
 }

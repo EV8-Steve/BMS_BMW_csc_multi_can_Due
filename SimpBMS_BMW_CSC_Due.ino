@@ -1,3 +1,4 @@
+#include <Arduino.h>
 #include <due_can.h>
 
 #include "config.h"
@@ -49,7 +50,6 @@ SystemScheduler scheduler;
 
 SerialConsoleManager console;
 
-SettingsManager settingsManager;
 
 CSCAddressManager csc;
 

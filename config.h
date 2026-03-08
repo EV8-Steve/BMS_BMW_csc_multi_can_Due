@@ -62,9 +62,10 @@ Balancing Configuration
 #define BALANCE_START_VOLTAGE  3.90     // cell voltage to start balancing
 #define BALANCE_DELTA          0.010    // cell delta before balancing
 #define BALANCE_HYSTERESIS     0.005    // hysteresis below highest cell
-#define MAX_BALANCE_CELLS      4
+#define MAX_BALANCE_CELLS_PER_MODULE 6
 #define BALANCE_CURRENT_LIMIT  2.0f
-
+#define BALANCE_MODULE_COOLDOWN_MS 30000
+#define MAX_BALANCE_CELLS_GLOBAL 12
 
 /*
 ================================================

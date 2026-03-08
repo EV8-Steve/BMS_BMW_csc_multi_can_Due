@@ -1,7 +1,10 @@
 #include "SettingsManager.h"
 #include <DueFlashStorage.h>
 
+SettingsManager settingsManager;
+
 DueFlashStorage flash;
+
 
 
 
@@ -14,7 +17,7 @@ Load Settings From Flash
 void SettingsManager::load()
 {
 
-    byte* ptr = (byte*)&settings;
+    byte* ptr = (byte*)&settings    ;
 
     for(unsigned int i=0;i<sizeof(BMSSettings);i++)
     {

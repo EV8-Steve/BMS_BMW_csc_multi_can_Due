@@ -4,9 +4,7 @@
 
 class SettingsManager
 {
-
 public:
-
     void load();
     void save();
 
@@ -15,7 +13,7 @@ public:
     void factoryDefaults();
 
 private:
-
     BMSSettings settings;
-
 };
+
+extern SettingsManager settingsManager;

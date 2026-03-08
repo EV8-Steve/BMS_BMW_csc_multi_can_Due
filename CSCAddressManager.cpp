@@ -11,6 +11,11 @@ uint8_t NextID = 0;
 
 
 
+CSCAddressManager::CSCAddressManager()
+{
+}
+
+
 /*
 ================================================
 Send frame helper

@@ -77,3 +77,6 @@ Precharge logic
 IO control
 
 Nextion dashboard
+
+
+we are using 2 can buses to enable more than 6 csc's to be used, as there are only 6 unique id's available , so far we have implemented, csc's can be on either bus, either bus can have any number of csc's upto the maximum of 6 per bus, there will be duplicated id's across busses but not on the same bus, if duplite id's apprear on the same bus we impliment a scs renumbering comand on that bus, we map moudle by bus and id and the global numbering system is sequential irrelivant of how many modules are on each bus, charger and current sensors can also be on either bus
