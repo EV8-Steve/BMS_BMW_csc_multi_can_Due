@@ -1,0 +1,79 @@
+spec
+
+Features That Must Exist (Combined System)
+
+From the design so far, the firmware must include all of these together:
+
+Core BMS
+
+Multi-bus BMW CSC support
+
+Sequential global module numbering
+
+CSC renumbering system
+
+Mask-based balancing
+
+Pack statistics cache
+
+Deterministic scheduler
+
+State machine safe contactor logic
+
+Diagnostics
+
+Serial console menu
+
+CAN sniffer toggle
+
+Pack summary
+
+Cell voltage table
+
+Temperature table
+
+CSV debug option
+
+CSC discovery / renumber commands
+
+Configuration (from original SimpBMS menu)
+
+Cell over-voltage limit
+
+Cell under-voltage limit
+
+Charge cutoff voltage
+
+Charge hysteresis
+
+Charge max current
+
+Charge end current
+
+Balance start voltage
+
+Balance delta
+
+Battery capacity
+
+Parallel strings
+
+Series cells
+
+Temperature limits
+
+Storage
+
+Persistent settings in flash
+
+SOC saved periodically
+
+Vehicle Integration
+
+Charger control
+
+Precharge logic
+
+IO control
+
+Nextion dashboard
