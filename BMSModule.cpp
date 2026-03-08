@@ -194,3 +194,20 @@ float BMSModule::getModuleVoltage()
     return v;
 
 }
+
+/*
+================================================
+Clear Module voltages
+================================================
+*/
+
+void BMSModule::clearVoltages()
+{
+    for(int i = 0; i < 16; i++)
+        cellVolt[i] = 0;
+
+    for(int i = 0; i < 2; i++)
+        temperature[i] = 0;
+
+    moduleVolt = 0;
+}

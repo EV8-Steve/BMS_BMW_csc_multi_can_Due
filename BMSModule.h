@@ -27,6 +27,7 @@ public:
 
     float getModuleVoltage();
 
+	void clearVoltages();
 private:
 
     float cellVolt[16];

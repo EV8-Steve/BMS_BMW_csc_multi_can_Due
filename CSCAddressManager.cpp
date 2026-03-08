@@ -7,7 +7,12 @@ extern CANRaw Can1;
 
 
 
-uint8_t NextID = 0;
+/*
+ID counters for each CAN bus
+bus 0 -> nextID[0]
+bus 1 -> nextID[1]
+*/
+uint8_t nextID[2] = {0,0};
 
 
 
@@ -93,7 +98,7 @@ void CSCAddressManager::renumberBus(uint8_t bus)
     --------------------------------
     */
 
-    NextID = 0;
+    nextID[bus] = 0;
 
     msg.id = 0x0A0;
     msg.length = 8;
@@ -117,6 +122,8 @@ Handle unassigned module
 
 void CSCAddressManager::handleUnassigned(uint8_t bus, CAN_FRAME &frame)
 {
+    if(discoveryLocked)
+        return;
 
     CAN_FRAME msg;
 
@@ -171,8 +178,13 @@ void CSCAddressManager::handleUnassigned(uint8_t bus, CAN_FRAME &frame)
     --------------------------------
     */
 
+    if(nextID[bus] >= 6)
+    {
+        Serial.println("Maximum CSC IDs reached on this bus");
+        return;
+    }
     msg.data.bytes[0] = 0x5B;
-    msg.data.bytes[1] = NextID;
+    msg.data.bytes[1] = nextID[bus];
 
     sendFrame(bus,msg);
 
@@ -181,18 +193,26 @@ void CSCAddressManager::handleUnassigned(uint8_t bus, CAN_FRAME &frame)
 
 
     msg.data.bytes[0] = 0x37;
-    msg.data.bytes[1] = NextID;
+    msg.data.bytes[1] = nextID[bus];
 
     sendFrame(bus,msg);
 
 
 
     Serial.print("CSC assigned ID ");
-    Serial.println(NextID);
+    Serial.print(nextID[bus]);
+    Serial.print(" on bus ");
+    Serial.println(bus);
 
 
 
-    NextID++;
+    nextID[bus]++;
+
+    /*
+    Give module time to store ID
+    */
+
+    delay(20);
 
 
 

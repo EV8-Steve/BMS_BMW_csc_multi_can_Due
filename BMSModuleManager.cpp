@@ -56,6 +56,11 @@ Register new module
 int BMSModuleManager::registerModule(uint8_t bus,uint8_t id)
 {
 
+    int existing = findModule(bus,id);
+
+    if(existing >= 0)
+        return existing;
+
     if(numModules >= MAX_MODULES)
         return -1;
 
@@ -65,6 +70,8 @@ int BMSModuleManager::registerModule(uint8_t bus,uint8_t id)
     modules[numModules].setExists(true);
 
     numModules++;
+    if(numModules > MAX_MODULES)
+        numModules = MAX_MODULES;
 
     Serial.print("CSC discovered: Bus ");
     Serial.print(bus);
@@ -144,6 +151,7 @@ void BMSModuleManager::decodecan(uint8_t bus, CAN_FRAME &frame, int debug)
         if(module < 0)
             return;
 
+        modules[module].markAlive();
         modules[module].decodetemp(frame,0);
 
     }
@@ -196,7 +204,9 @@ void BMSModuleManager::updateWatchdogs()
             Serial.print("CSC timeout module ");
             Serial.println(i);
 
+
             modules[i].setExists(false);
+            modules[i].clearVoltages();
 
         }
 
@@ -225,6 +235,9 @@ void BMSModuleManager::updatePackStatistics()
 
     for(int i=0;i<numModules;i++)
     {
+
+        if(!modules[i].isExisting())
+            continue;
 
         packVoltage += modules[i].getModuleVoltage();
 
@@ -346,12 +359,13 @@ float BMSModuleManager::getAvgTemperature()
 
     for(int i=0;i<numModules;i++)
     {
+        if(!modules[i].isExisting())
+            continue;
 
         total += modules[i].getTemperature(0);
         total += modules[i].getTemperature(1);
 
         count += 2;
-
     }
 
     if(count == 0)
@@ -499,6 +513,7 @@ void BMSModuleManager::clearAllModules()
         moduleID[i] = 0;
 
         modules[i].setExists(false);
+        modules[i].clearVoltages();
 
     }
 
