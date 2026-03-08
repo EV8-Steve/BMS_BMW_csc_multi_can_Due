@@ -73,7 +73,7 @@ void SystemScheduler::update()
     if(now - last10ms >= 10)
     {
 
-        last10ms = now;
+        last10ms  += 10;
 
         bms.updateWatchdogs();
 
@@ -90,7 +90,7 @@ void SystemScheduler::update()
     if(now - last100ms >= 100)
     {
 
-        last100ms = now;
+        last100ms  += 100;
 
         bms.updatePackStatistics();
 
@@ -115,7 +115,7 @@ void SystemScheduler::update()
     if(now - last1s >= 1000)
     {
 
-        last1s = now;
+        last1s  += 1000;
 
         bms.sendKeepAlive();
 
@@ -161,7 +161,7 @@ void SystemScheduler::update()
     if(now - last5s >= 5000)
     {
 
-        last5s = now;
+        last5s  += 5000;
 
         Serial.print("Modules detected: ");
         Serial.println(bms.getNumModules());

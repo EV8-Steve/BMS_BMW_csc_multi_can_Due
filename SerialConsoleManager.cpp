@@ -27,12 +27,278 @@ void SerialConsoleManager::init()
     mode = MODE_MAIN;
 }
 
-void SerialConsoleManager::printPackSummary() {}
-void SerialConsoleManager::printCellTable() {}
-void SerialConsoleManager::printTemperatureTable() {}
-void SerialConsoleManager::printCSVHeader() {}
-void SerialConsoleManager::printModuleMap() {}
-void SerialConsoleManager::printCSVTelemetry() {}
+void SerialConsoleManager::printPackSummary()
+{
+
+    Serial.println();
+    Serial.println("===== PACK SUMMARY =====");
+
+    Serial.print("Modules:        ");
+    Serial.println(bms.getNumModules());
+
+    Serial.print("Pack Voltage:   ");
+    Serial.print(bms.getPackVoltage());
+    Serial.println(" V");
+
+    float high = bms.getHighCellVolt();
+    float low  = bms.getLowCellVolt();
+
+    Serial.print("High Cell:      ");
+    Serial.print(high);
+    Serial.println(" V");
+
+    Serial.print("Low Cell:       ");
+    Serial.print(low);
+    Serial.println(" V");
+
+    Serial.print("Delta:          ");
+    Serial.print(high - low);
+    Serial.println(" V");
+
+    Serial.println();
+
+    Serial.print("High Temp:      ");
+    Serial.print(bms.getHighTemperature());
+    Serial.println(" C");
+
+    Serial.print("Low Temp:       ");
+    Serial.print(bms.getLowTemperature());
+    Serial.println(" C");
+
+    Serial.println();
+
+    Serial.print("Pack Current:   ");
+    Serial.print(currentact);
+    Serial.println(" A");
+
+    Serial.print("SOC:            ");
+    Serial.print(soc.getSOC());
+    Serial.println(" %");
+
+    Serial.println();
+
+}
+void SerialConsoleManager::printCellTable()
+{
+
+    Serial.println();
+    Serial.println("===== CELL VOLTAGE TABLE =====");
+    Serial.println();
+
+    int modules = bms.getNumModules();
+
+    if(modules == 0)
+    {
+        Serial.println("No modules detected");
+        return;
+    }
+
+    /*
+    Header row
+    */
+
+    Serial.print("Module  Bus  ID | ");
+
+    for(int c = 0; c < 16; c++)
+    {
+        Serial.print("C");
+        Serial.print(c);
+        Serial.print("     ");
+    }
+
+    Serial.println();
+
+    Serial.println("---------------------------------------------------------------------------------------------------------------");
+
+    /*
+    Print each module
+    */
+
+    for(int m = 0; m < modules; m++)
+    {
+
+        Serial.print(m);
+        Serial.print("       ");
+
+        Serial.print(bms.getModuleBus(m));
+        Serial.print("    ");
+
+        Serial.print(bms.getModuleID(m));
+        Serial.print("  | ");
+
+        for(int c = 0; c < 16; c++)
+        {
+
+            float v = bms.getCellVoltage(m,c);
+
+            if(v < 2.0)
+                Serial.print("----  ");
+            else
+            {
+                Serial.print(v,3);
+                Serial.print("  ");
+            }
+
+        }
+
+        Serial.println();
+
+    }
+
+}
+void SerialConsoleManager::printTemperatureTable()
+{
+
+    Serial.println();
+    Serial.println("===== TEMPERATURE TABLE =====");
+    Serial.println();
+
+    int modules = bms.getNumModules();
+
+    if(modules == 0)
+    {
+        Serial.println("No modules detected");
+        return;
+    }
+
+    /*
+    Header
+    */
+
+    Serial.println("Module  Bus  ID |  T0 (C)   T1 (C)");
+    Serial.println("-------------------------------------");
+
+    /*
+    Print module temperatures
+    */
+
+    for(int m = 0; m < modules; m++)
+    {
+
+        Serial.print(m);
+        Serial.print("       ");
+
+        Serial.print(bms.getModuleBus(m));
+        Serial.print("    ");
+
+        Serial.print(bms.getModuleID(m));
+        Serial.print("  |  ");
+
+        float t0 = bms.getTemperature(m,0);
+        float t1 = bms.getTemperature(m,1);
+
+        if(t0 < -50 || t0 > 150)
+            Serial.print("----   ");
+        else
+        {
+            Serial.print(t0,1);
+            Serial.print("    ");
+        }
+
+        if(t1 < -50 || t1 > 150)
+            Serial.print("----");
+        else
+            Serial.print(t1,1);
+
+        Serial.println();
+
+    }
+
+}
+void SerialConsoleManager::printCSVHeader()
+{
+
+    Serial.println();
+    Serial.println("CSV telemetry stream enabled");
+    Serial.println();
+
+    Serial.print("time_ms,");
+    Serial.print("modules,");
+    Serial.print("pack_voltage,");
+    Serial.print("current,");
+    Serial.print("high_cell,");
+    Serial.print("low_cell,");
+    Serial.print("cell_delta,");
+    Serial.print("high_temp,");
+    Serial.print("low_temp,");
+    Serial.print("soc");
+
+    Serial.println();
+
+}
+void SerialConsoleManager::printCSVTelemetry()
+{
+
+    uint32_t now = millis();
+
+    float packV = bms.getPackVoltage();
+    float high  = bms.getHighCellVolt();
+    float low   = bms.getLowCellVolt();
+
+    Serial.print(now);
+    Serial.print(",");
+
+    Serial.print(bms.getNumModules());
+    Serial.print(",");
+
+    Serial.print(packV,3);
+    Serial.print(",");
+
+    Serial.print(currentact,2);
+    Serial.print(",");
+
+    Serial.print(high,3);
+    Serial.print(",");
+
+    Serial.print(low,3);
+    Serial.print(",");
+
+    Serial.print(high - low,3);
+    Serial.print(",");
+
+    Serial.print(bms.getHighTemperature(),1);
+    Serial.print(",");
+
+    Serial.print(bms.getLowTemperature(),1);
+    Serial.print(",");
+
+    Serial.print(soc.getSOC(),1);
+
+    Serial.println();
+
+}
+void SerialConsoleManager::printModuleMap()
+{
+
+    Serial.println();
+    Serial.println("===== MODULE MAP =====");
+    Serial.println();
+
+    int modules = bms.getNumModules();
+
+    if(modules == 0)
+    {
+        Serial.println("No modules discovered");
+        return;
+    }
+
+    Serial.println("Global  Bus  CSC_ID");
+    Serial.println("--------------------");
+
+    for(int m = 0; m < modules; m++)
+    {
+
+        Serial.print(m);
+        Serial.print("       ");
+
+        Serial.print(bms.getModuleBus(m));
+        Serial.print("    ");
+
+        Serial.println(bms.getModuleID(m));
+
+    }
+
+}
 
 /*
 ================================================
