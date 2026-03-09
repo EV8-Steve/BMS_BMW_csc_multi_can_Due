@@ -32,12 +32,11 @@ void BMSStateMachine::update()
 
         case BMS_BOOT:
 
-            if(bms.modulesHealthy())
-            {
-                state = BMS_READY;
-                Serial.println("BMS READY");
-            }
-
+        if(bms.getNumModules() > 0 && bms.modulesHealthy())
+        {
+            state = BMS_READY;
+            Serial.println("BMS READY");
+        }
             break;
 
 
@@ -78,42 +77,70 @@ void BMSStateMachine::update()
                 Serial.println("DRIVE ENABLED");
 
             }
-
-            break;
-
-
-
-        case BMS_DRIVE:
-
             if(!protection.dischargeAllowed())
             {
+                Serial.println("FAULT DURING PRECHARGE");
 
-                Serial.println("DISCHARGE FAULT");
-
-                if(!io.vehicleInDrive())
-                {
-
-                    io.setMainContactor(false);
-
-                    state = BMS_ERROR;
-
-                }
-
+                io.setMainContactor(false);
+                state = BMS_ERROR;
             }
 
             break;
 
 
 
-        case BMS_ERROR:
+    case BMS_DRIVE:
 
-            io.setFault(true);
+        if(protection.moduleFaultActive())
+        {
 
-            break;
+            Serial.println("MODULE FAULT");
+
+            if(!io.vehicleInDrive())
+            {
+                io.setMainContactor(false);
+                state = BMS_ERROR;
+            }
+
+        }
+
+        if(!protection.dischargeAllowed())
+        {
+
+            Serial.println("DISCHARGE FAULT");
+
+            if(!io.vehicleInDrive())
+            {
+
+                io.setMainContactor(false);
+
+                state = BMS_ERROR;
+
+            }
+
+        }
+
+        if(!ign)
+        {
+            io.setMainContactor(false);
+            io.setInverterEnable(false);
+
+            state = BMS_READY;
+        }
+
+        break;
+
+
+
+    case BMS_ERROR:
+
+        io.setFault(true);
+
+        break;
 
     }
 
-}
+    }
 
 
 

@@ -7,9 +7,10 @@ extern IOManager io;
 
 void PrechargeManager::init()
 {
-    prechargeComplete=false;
+    prechargeComplete = false;
+    io.setInverterEnable(false);
+    startTime = 0;
 }
-
 
 
 void PrechargeManager::update(float packVoltage)

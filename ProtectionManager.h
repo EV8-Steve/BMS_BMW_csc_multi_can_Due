@@ -13,7 +13,10 @@ public:
 
     bool dischargeAllowed();
 
+    bool moduleFaultActive();
+
 private:
+    bool moduleFault;
 
     bool allowCharge;
 

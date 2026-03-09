@@ -4,13 +4,11 @@
 extern BMSModuleManager bms;
 
 
-
 void ProtectionManager::init()
 {
-
     allowCharge = true;
     allowDischarge = true;
-
+    moduleFault = false;
 }
 
 
@@ -22,7 +20,15 @@ void ProtectionManager::update()
 
     checkTemperature();
 
+    if(!bms.modulesHealthy())
+    {
+        moduleFault = true;
+
+        Serial.println("Module communication lost");
+    }
+
 }
+
 
 
 
@@ -30,39 +36,28 @@ void ProtectionManager::checkVoltages()
 {
 
     float highCell = bms.getHighCellVolt();
-    float lowCell = bms.getLowCellVolt();
-
+    float lowCell  = bms.getLowCellVolt();
 
     if(highCell > OVER_VOLTAGE_LIMIT)
     {
-
         allowCharge = false;
-
         Serial.println("Charge disabled: Overvoltage");
-
     }
-    else
+
+    if(highCell < (OVER_VOLTAGE_LIMIT - 0.05))
     {
-
         allowCharge = true;
-
     }
-
-
 
     if(lowCell < UNDER_VOLTAGE_LIMIT)
     {
-
         allowDischarge = false;
-
         Serial.println("Discharge disabled: Undervoltage");
-
     }
-    else
+
+    if(lowCell > (UNDER_VOLTAGE_LIMIT + 0.05))
     {
-
         allowDischarge = true;
-
     }
 
 }
@@ -111,4 +106,9 @@ bool ProtectionManager::chargeAllowed()
 bool ProtectionManager::dischargeAllowed()
 {
     return allowDischarge;
+}
+
+bool ProtectionManager::moduleFaultActive()
+{
+    return moduleFault;
 }
