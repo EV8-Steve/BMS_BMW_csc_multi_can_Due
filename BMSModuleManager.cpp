@@ -103,13 +103,17 @@ void BMSModuleManager::decodecan(uint8_t bus, CAN_FRAME &frame, int debug)
 
 
 
+
+
     /*
     --------------------------------
     Voltage frames
     --------------------------------
     */
 
-    if(frame.id > 0x99 && frame.id < 0x180)
+    uint16_t base = frame.id & 0xFF0;
+
+    if(base >= 0x1A0 && base <= 0x1F0)
     {
 
         uint8_t id = frame.id & 0x0F;
@@ -129,6 +133,8 @@ void BMSModuleManager::decodecan(uint8_t bus, CAN_FRAME &frame, int debug)
         return;
 
     }
+
+
 
 
 

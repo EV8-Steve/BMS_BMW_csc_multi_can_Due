@@ -2,6 +2,8 @@
 
 extern CANRaw Can0;
 
+OutlanderCharger outlander;
+
 
 
 void OutlanderCharger::init()

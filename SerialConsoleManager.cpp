@@ -4,11 +4,13 @@
 #include "SOCManager.h"
 #include "CSCAddressManager.h"
 #include "SettingsManager.h"
+#include "BalanceManager.h"
 
 extern BMSModuleManager bms;
 extern SOCManager soc;
 extern CSCAddressManager csc;
 extern SettingsManager settingsManager;
+extern BalanceManager balance;
 
 extern float currentact;
 
@@ -205,6 +207,38 @@ void SerialConsoleManager::printTemperatureTable()
     }
 
 }
+void SerialConsoleManager::printBalanceStatus()
+{
+
+    Serial.println();
+    Serial.println("=== Balance Status ===");
+
+    int modules = bms.getNumModules();
+
+    for(int m=0; m<modules; m++)
+    {
+
+        Serial.print("Module ");
+        Serial.print(m);
+        Serial.print(": ");
+
+        uint16_t mask = balance.getModuleMask(m);
+
+        for(int c=0;c<CELLS_PER_MODULE;c++)
+        {
+            if(mask & (1 << c))
+                Serial.print("B");
+            else
+                Serial.print(".");
+        }
+
+        Serial.println();
+
+    }
+
+}
+
+
 void SerialConsoleManager::printCSVHeader()
 {
 
@@ -336,6 +370,8 @@ void SerialConsoleManager::update()
                     break;
 
                     case 'k': printModuleMap(); break;
+
+                    case 'z': printBalanceStatus(); break;
 
                     case 'b':
                         mode = MODE_BATTERY_SETTINGS;
@@ -637,13 +673,27 @@ void SerialConsoleManager::printChargerMenu()
     Serial.println(s.endChargeCurrent);
 
     Serial.print("t Charger type: ");
-    Serial.println(s.chargerType);
 
+    switch(s.chargerType)
+    {
+        case CHARGER_RELAY:
+            Serial.println("Relay");
+            break;
+
+        case CHARGER_OUTLANDER:
+            Serial.println("Outlander");
+            break;
+
+        case CHARGER_MG:
+            Serial.println("MG EV");
+            break;
+
+
+    }
+    Serial.print("d Direct HV control: ");
+     Serial.println(s.chargerDirectHV);
     Serial.print("c Charger CAN period: ");
     Serial.println(s.chargerCanPeriod);
-
-    Serial.print("d Direct HV control: ");
-    Serial.println(s.chargerDirectHV);
 
     Serial.println("q Return");
 
@@ -677,11 +727,30 @@ void SerialConsoleManager::handleChargerMenu(char cmd)
             s.endChargeCurrent = Serial.parseFloat();
         break;
 
-        case 't':
-            Serial.println("Enter charger type number:");
-            while(!Serial.available());
-            s.chargerType = Serial.parseInt();
-        break;
+    case 't':
+    {
+        Serial.println();
+        Serial.println("Select charger type:");
+        Serial.println("0 - Relay");
+        Serial.println("1 - Outlander");
+        Serial.println("2 - MG EV");
+
+        while(!Serial.available());
+
+        int type = Serial.parseInt();
+
+        if(type >= 0 && type <= 2)
+        {
+            s.chargerType = type;
+            Serial.print("Charger set to ");
+            Serial.println(type);
+        }
+        else
+        {
+            Serial.println("Invalid charger type");
+        }
+    }
+    break;
 
         case 'c':
             Serial.println("Enter charger CAN period:");
@@ -690,7 +759,7 @@ void SerialConsoleManager::handleChargerMenu(char cmd)
         break;
 
         case 'd':
-            s.chargerDirectHV = !s.chargerDirectHV;
+           s.chargerDirectHV = !s.chargerDirectHV;
         break;
 
         case 'q':
@@ -699,7 +768,8 @@ void SerialConsoleManager::handleChargerMenu(char cmd)
             return;
 
     }
-
+    settingsManager.save();
+    printChargerMenu();
 
 
 }

@@ -9,10 +9,18 @@ void IOManager::init()
     pinMode(PIN_INVERTER_ENABLE, OUTPUT);
     pinMode(PIN_FAULT_OUTPUT, OUTPUT);
 
-    pinMode(PIN_IGNITION, INPUT_PULLUP);
-    pinMode(PIN_CHARGE_REQ, INPUT_PULLUP);
-    pinMode(PIN_DISCHARGE_REQ, INPUT_PULLUP);
-    pinMode(PIN_DRIVE_STATE, INPUT_PULLUP);
+    pinMode(PIN_IGNITION, INPUT);
+    pinMode(PIN_CHARGE_REQ, INPUT);
+    pinMode(PIN_DISCHARGE_REQ, INPUT);
+    pinMode(PIN_DRIVE_STATE, INPUT);
+
+
+    // Safe startup states
+    digitalWrite(PIN_MAIN_CONTACTOR, LOW);
+    digitalWrite(PIN_PRECHARGE, LOW);
+    digitalWrite(PIN_CHARGER_ENABLE, LOW);
+    digitalWrite(PIN_INVERTER_ENABLE, LOW);
+    digitalWrite(PIN_FAULT_OUTPUT, LOW);
 
 }
 

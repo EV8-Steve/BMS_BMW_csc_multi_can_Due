@@ -14,6 +14,7 @@ public:
     void update();
 
     bool isBalancing();
+    uint16_t getModuleMask(int module);
 
 private:
 
@@ -23,6 +24,7 @@ private:
 
     uint32_t lastBalanceTime;
     uint32_t moduleCooldown[MAX_MODULES];
+    uint16_t moduleMask[MAX_MODULES];
 
     bool balancingActive;
     bool dutyState;

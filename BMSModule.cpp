@@ -14,7 +14,8 @@ BMSModule::BMSModule()
 
     for(int i=0;i<2;i++)
         temperature[i] = 0;
-
+    
+    
 }
 
 
@@ -32,17 +33,15 @@ void BMSModule::decodecan(uint32_t id, CAN_FRAME &msg, bool debug)
 
     exists = true;
 
-    int group = (id & 0x0F);
+    int group = (id >> 4) & 0x07;
 
-    if(group > 7)                 // alternate CSC layout
-        group = (id >> 4) & 0x07;
 
     int cellBase = group * 2;
 
     for(int i=0;i<2;i++)
     {
 
-        uint16_t raw = (msg.data.bytes[i*2] << 8) | msg.data.bytes[i*2+1];
+        uint16_t raw = msg.data.bytes[i*2] + ((msg.data.bytes[i*2+1] & 0x3F) << 8);
 
         int cell = cellBase + i;
 
@@ -123,9 +122,11 @@ Cell voltage access
 
 float BMSModule::getCellVoltage(int cell)
 {
+    if(cell < 0 || cell >= 16)
+        return 0;
+
     return cellVolt[cell];
 }
-
 
 
 /*
@@ -140,7 +141,7 @@ float BMSModule::getHighCellV()
     float v = 0;
 
     for(int i=0;i<16;i++)
-        if(cellVolt[i] > v)
+        if(cellVolt[i] > 2.0 && cellVolt[i] > v)
             v = cellVolt[i];
 
     return v;
@@ -153,9 +154,9 @@ float BMSModule::getLowCellV()
 {
 
     float v = 5;
-
+    
     for(int i=0;i<16;i++)
-        if(cellVolt[i] < v)
+        if(cellVolt[i] > 2.0 && cellVolt[i] < v)
             v = cellVolt[i];
 
     return v;
@@ -169,12 +170,13 @@ float BMSModule::getLowCellV()
 Temperature access
 ================================================
 */
-
 float BMSModule::getTemperature(int sensor)
 {
+    if(sensor < 0 || sensor >= 2)
+        return 0;
+
     return temperature[sensor];
 }
-
 
 
 /*
@@ -189,7 +191,8 @@ float BMSModule::getModuleVoltage()
     float v = 0;
 
     for(int i=0;i<16;i++)
-        v += cellVolt[i];
+        if(cellVolt[i] > 2.0)
+            v += cellVolt[i];
 
     return v;
 

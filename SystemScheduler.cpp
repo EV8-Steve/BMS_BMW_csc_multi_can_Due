@@ -120,6 +120,10 @@ void SystemScheduler::update()
         bms.sendKeepAlive();
 
         soc.update(currentact);
+        soc.checkFullChargeReset(
+            bms.getHighCellVolt(),
+            currentact
+        );
 
         charger.update(
             bms.getPackVoltage(),

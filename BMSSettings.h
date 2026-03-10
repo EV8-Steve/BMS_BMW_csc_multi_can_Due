@@ -16,16 +16,14 @@ enum CurrentSensorType
     CURRENT_SENSOR_ISA_IVT       = 4
 };
 
-enum ChargerType
+
+    enum ChargerType
 {
-    CHARGER_RELAY      = 0,
-    CHARGER_BRUSA      = 1,
-    CHARGER_VOLT       = 2,
-    CHARGER_ELTEK      = 3,
-    CHARGER_ELCON      = 4,
-    CHARGER_VICTRON    = 5,
-    CHARGER_OUTLANDER  = 6
+    CHARGER_RELAY = 0,
+    CHARGER_OUTLANDER = 1,
+    CHARGER_MG = 2
 };
+
 
 
 /*

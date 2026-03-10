@@ -25,6 +25,14 @@ BalanceManager::BalanceManager()
     dutyState = false;
 }
 
+uint16_t BalanceManager::getModuleMask(int module)
+{
+    if(module < 0 || module >= MAX_MODULES)
+        return 0;
+
+    return moduleMask[module];
+}
+
 
 
 /*
@@ -45,6 +53,8 @@ void BalanceManager::init()
         moduleCooldown[i] = 0;
     }
 
+    for(int i=0;i<MAX_MODULES;i++)
+        moduleMask[i] = 0;
 }
 
 
@@ -65,7 +75,7 @@ void BalanceManager::update()
     Toggle duty state
     */
 
-    if(now - lastBalanceTime > BALANCE_DUTY_TIME)
+    if(now - lastBalanceTime >= BALANCE_DUTY_TIME)
     {
 
         dutyState = !dutyState;
@@ -116,7 +126,7 @@ void BalanceManager::applyBalancing()
     auto &settings = settingsManager.get();
 
     float lowCell  = bms.getLowCellVolt();
-    float highCell = bms.getHighCellVolt();
+
 
     balancingActive = false;
 
@@ -222,8 +232,9 @@ void BalanceManager::applyBalancing()
             moduleCooldown[m] = now + BALANCE_MODULE_COOLDOWN_MS;
         }
 
-        bms.sendBalanceMask(m,masks[m]);
+        moduleMask[m] = masks[m];
 
+        bms.sendBalanceMask(m,masks[m]);
     }
 
 }
@@ -330,6 +341,7 @@ void BalanceManager::disableBalancing()
 
     for(int m=0; m<modules; m++)
     {
+        moduleMask[m] = 0;   // clear stored mask
         bms.sendBalanceMask(m,0);
     }
 

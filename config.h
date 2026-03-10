@@ -97,8 +97,6 @@ Charger Configuration
 
 #define CHARGER_UPDATE_PERIOD  100   // ms between CAN messages
 
-
-
 /*
 ================================================
 CSC Discovery

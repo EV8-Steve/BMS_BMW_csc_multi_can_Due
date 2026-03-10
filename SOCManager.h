@@ -17,6 +17,8 @@ public:
 
     void setSOC(float soc);
 
+    void checkFullChargeReset(float highCell, float current);
+
 private:
 
     float packCapacity;
