@@ -109,6 +109,7 @@ void CurrentSensorManager::processCAB300(CAN_FRAME &frame)
     int16_t raw = (frame.data.bytes[0] << 8) | frame.data.bytes[1];
 
     currentAct = raw * 0.1;
+    currentact = getCurrent();
 
 }
 
@@ -125,6 +126,7 @@ void CurrentSensorManager::processCAB500(CAN_FRAME &frame)
     int16_t raw = (frame.data.bytes[0] << 8) | frame.data.bytes[1];
 
     currentAct = raw * 0.1;
+    currentact = getCurrent();
 
 }
 
@@ -145,6 +147,7 @@ void CurrentSensorManager::processISA(CAN_FRAME &frame)
         frame.data.bytes[5];
 
     currentAct = raw * 0.001;
+        currentact = getCurrent();
 
 }
 
@@ -160,7 +163,7 @@ void CurrentSensorManager::processAnalog()
 
     int raw = analogRead(A0);
 
-    float voltage = raw * (3.3 / 1023.0);
+    float voltage = raw * (3.3 / 4095.0);
 
     currentAct = (voltage - 1.65) * 100;
 

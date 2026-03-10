@@ -454,10 +454,34 @@ Main Menu
 void SerialConsoleManager::printMainMenu()
 {
     Serial.println();
-    Serial.println("=== SimpBMS Menu ===");
-    Serial.println("1 - Battery settings");
-    Serial.println("2 - Charger settings");
-    Serial.println("3 - Current sensor settings");
+    Serial.println("===== SimpBMS Console =====");
+
+    Serial.println();
+    Serial.println("Diagnostics:");
+    Serial.println("p - Pack summary");
+    Serial.println("c - Cell voltage table");
+    Serial.println("t - Temperature table");
+    Serial.println("k - Module map");
+    Serial.println("z - Balance status");
+
+    Serial.println();
+    Serial.println("Telemetry:");
+    Serial.println("v - Toggle CSV stream");
+
+    Serial.println();
+    Serial.println("CSC tools:");
+    Serial.println("d - Run CSC discovery");
+    Serial.println("l - Lock discovery");
+    Serial.println("x - Renumber bus 0");
+    Serial.println("y - Renumber bus 1");
+
+    Serial.println();
+    Serial.println("Settings:");
+    Serial.println("b - Battery settings");
+    Serial.println("e - Charger settings");
+    Serial.println("s - Current sensor settings");
+
+    Serial.println();
 }
 
 
@@ -477,31 +501,37 @@ void SerialConsoleManager::printBatteryMenu()
 
     Serial.println("CELL LIMITS");
 
-    Serial.print("v Cell OV limit: ");
+    Serial.print("v Cell Over Voltag limit: (V) ");
     Serial.println(s.cellOverVoltage);
 
-    Serial.print("u Cell UV limit: ");
+    Serial.print("u Cell Under Voltage limit: (V) ");
     Serial.println(s.cellUnderVoltage);
 
     Serial.println();
 
     Serial.println("CHARGE TARGET");
 
-    Serial.print("t Cell charge target: ");
+    Serial.print("t Cell charge target: (V)");
     Serial.println(s.cellChargeTarget);
 
-    Serial.print("y Charge hysteresis: ");
-    Serial.println(s.cellChargeHysteresis);
+    Serial.print("y Charge hysteresis (V): ");
+    Serial.print(s.cellChargeHysteresis,3);
+    Serial.print(" (");
+    Serial.print(s.cellChargeHysteresis * 1000,0);
+    Serial.println(" mV)");
 
     Serial.println();
 
     Serial.println("BALANCING");
 
-    Serial.print("b Balance voltage: ");
+    Serial.print("b Balance start voltage: (V) ");
     Serial.println(s.balanceVoltage);
 
-    Serial.print("d Balance delta: ");
+    Serial.print("d Balance delta: (V) ");
     Serial.println(s.balanceDelta);
+    Serial.print(" (");
+    Serial.print(s.balanceDelta * 1000,0);
+    Serial.println(" mV)");
 
     Serial.println();
 
@@ -516,7 +546,7 @@ void SerialConsoleManager::printBatteryMenu()
     Serial.print("p Parallel strings: ");
     Serial.println(s.parallelStrings);
 
-    Serial.print("x Max discharge current: ");
+    Serial.print("x Max discharge current:(A) ");
     Serial.println(s.maxDischargeCurrent);
 
     Serial.println();
@@ -666,10 +696,10 @@ void SerialConsoleManager::printChargerMenu()
     Serial.println();
     Serial.println("===== Charger Settings =====");
 
-    Serial.print("v Max charge current: ");
+    Serial.print("v Max charge current: (A)");
     Serial.println(s.maxChargeCurrent);
 
-    Serial.print("e End charge current: ");
+    Serial.print("e End charge current: (A)");
     Serial.println(s.endChargeCurrent);
 
     Serial.print("t Charger type: ");
@@ -791,25 +821,43 @@ void SerialConsoleManager::printCurrentSensorMenu()
     Serial.println("===== Current Sensor Settings =====");
 
     Serial.print("t Sensor type: ");
-    Serial.println(s.currentSensorType);
 
-    Serial.print("i Invert current: ");
-    Serial.println(s.currentInvert);
+    switch(s.currentSensorType)
+    {
+        case SENSOR_NONE:
+            Serial.println("None");
+        break;
 
-    Serial.print("m Multiplier: ");
+        case SENSOR_LEM_CAB500:
+            Serial.println("LEM CAB500");
+        break;
+
+        case SENSOR_SHUNT:
+            Serial.println("Analog Shunt");
+        break;
+
+        case SENSOR_CAN:
+            Serial.println("CAN Sensor");
+        break;
+
+        default:
+            Serial.println("Unknown");
+        break;
+    }
+
+    Serial.print("i Invert current (0/1): ");
+    Serial.println(s.currentInvert ? 1 : 0);
+
+    Serial.print("m Multiplier (A/LSB): ");
     Serial.println(s.currentMultiplier);
 
-    Serial.print("d Deadband: ");
+    Serial.print("d Deadband (A): ");
     Serial.println(s.currentDeadband);
 
     Serial.print("c CAN ID: ");
     Serial.println(s.currentCanID);
 
     Serial.println("q Return");
-
-
-
-
 
 }
 
@@ -829,15 +877,36 @@ void SerialConsoleManager::handleCurrentSensorMenu(char cmd)
     switch(cmd)
     {
 
-        case 't':
-            Serial.println("Enter sensor type:");
-            while(!Serial.available());
-            s.currentSensorType = Serial.parseInt();
-        break;
+    case 't':
+    {
+        Serial.println();
+        Serial.println("Select current sensor:");
+        Serial.println("0 - None");
+        Serial.println("1 - LEM CAB500");
+        Serial.println("2 - Analog shunt");
+        Serial.println("3 - CAN sensor");
 
-        case 'i':
-            s.currentInvert = !s.currentInvert;
-        break;
+        while(!Serial.available());
+
+        int type = Serial.parseInt();
+
+        if(type >= 0 && type <= 3)
+        {
+            s.currentSensorType = type;
+
+            Serial.print("Sensor set to ");
+            Serial.println(type);
+        }
+        else
+        {
+            Serial.println("Invalid sensor type");
+        }
+    }
+    break;
+
+    case 'i':
+        s.currentInvert = !s.currentInvert;
+    break;
 
         case 'm':
             Serial.println("Enter multiplier:");

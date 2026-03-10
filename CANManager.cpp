@@ -1,7 +1,14 @@
 #include "CANManager.h"
 #include "BMSModuleManager.h"
+#include "CurrentSensorManager.h"
+#include "ChargerManager.h"
+#include "OutlanderChargerStatus.h"
+
+extern OutlanderChargerStatus outlanderStatus;
 
 extern BMSModuleManager bms;
+extern CurrentSensorManager currentSensor;
+extern ChargerManager charger;
 
 
 
@@ -20,6 +27,9 @@ public:
     {
 
         bms.decodecan(0, *frame, 0);
+
+        currentSensor.processCAN(*frame);
+        outlanderStatus.processCAN(*frame);
 
     }
 
@@ -42,6 +52,8 @@ public:
     {
 
         bms.decodecan(1, *frame, 0);
+        currentSensor.processCAN(*frame);
+        outlanderStatus.processCAN(*frame);
 
     }
 

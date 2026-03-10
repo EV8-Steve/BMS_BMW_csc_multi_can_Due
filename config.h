@@ -97,6 +97,20 @@ Charger Configuration
 
 #define CHARGER_UPDATE_PERIOD  100   // ms between CAN messages
 
+
+
+/*
+================================================
+Current sensor Configuration
+================================================
+*/
+
+#define SENSOR_NONE       0
+#define SENSOR_LEM_CAB500 1
+#define SENSOR_SHUNT      2
+#define SENSOR_CAN        3
+
+
 /*
 ================================================
 CSC Discovery
